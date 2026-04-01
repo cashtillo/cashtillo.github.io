@@ -254,7 +254,7 @@
   <div class="header">
     <div>
       <h1>Bidroom Estimating Tool</h1>
-      <p>Enter items ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ auto-calculates margin, profit &amp; rebate</p>
+      <p>Enter items $0.00 auto-calculates margin, profit &amp; rebate</p>
     </div>
   </div>
 
@@ -272,7 +272,7 @@
 <div id="jobNameDisplay" class="job-name-print"></div>
 <div class="legend">
       <div class="legend-item"><div class="legend-dot dot-green"></div> GMP &gt; 20% (Healthy)</div>
-      <div class="legend-item"><div class="legend-dot dot-orange"></div> GMP 10ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ20% (Watch)</div>
+      <div class="legend-item"><div class="legend-dot dot-orange"></div> GMP 10ÃÂ–20% (Watch)</div>
       <div class="legend-item"><div class="legend-dot dot-red"></div> GMP &lt; 10% (Low)</div>
     </div>
 
@@ -323,19 +323,19 @@
     <div class="summary-grid">
       <div class="summary-box">
         <h3>Quote Summary</h3>
-        <div class="sum-row"><span class="sl">Total Retail</span><span class="sv" id="s-totalRetail">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</span></div>
-        <div class="sum-row"><span class="sl">Total Cost</span><span class="sv" id="s-totalCost">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</span></div>
-        <div class="sum-row"><span class="sl">Total Profit</span><span class="sv" id="s-totalProfit">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</span></div>
-        <div class="sum-row"><span class="sl">Blended GMP</span><span class="sv" id="s-blendedGMP">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</span></div>
-        <div class="sum-row"><span class="sl">Tax (10%)</span><span class="sv" id="s-tax">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</span></div>
+        <div class="sum-row"><span class="sl">Total Retail</span><span class="sv" id="s-totalRetail">$0.00</span></div>
+        <div class="sum-row"><span class="sl">Total Cost</span><span class="sv" id="s-totalCost">$0.00</span></div>
+        <div class="sum-row"><span class="sl">Total Profit</span><span class="sv" id="s-totalProfit">$0.00</span></div>
+        <div class="sum-row"><span class="sl">Blended GMP</span><span class="sv" id="s-blendedGMP">$0.00</span></div>
+        <div class="sum-row"><span class="sl">Tax (10%)</span><span class="sv" id="s-tax">$0.00</span></div>
         <div class="sum-row"><span class="sl">Delivery</span><span class="sv"><input type="number" id="deliveryInput" placeholder="0.00" min="0" step="0.01" style="border:1px solid #ddd;border-radius:5px;padding:3px 7px;font-size:13px;width:90px" oninput="updateSummary()"></span></div>
-        <div class="sum-row highlight"><span class="sl">Due Today</span><span class="sv" id="s-due">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</span></div>
+        <div class="sum-row highlight"><span class="sl">Due Today</span><span class="sv" id="s-due">$0.00</span></div>
       </div>
       <div class="rebate-box">
         <h3>11% Menards Rebate</h3>
-        <div class="sum-row"><span class="sl">Subtotal (Retail)</span><span class="sv" id="r-subtotal">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</span></div>
-        <div class="sum-row"><span class="sl">Rebate (11%)</span><span class="sv" id="r-rebate" style="color:#c0392b">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</span></div>
-        <div class="sum-row highlight"><span class="sl">After Rebate</span><span class="sv" id="r-after">ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ</span></div>
+        <div class="sum-row"><span class="sl">Subtotal (Retail)</span><span class="sv" id="r-subtotal">$0.00</span></div>
+        <div class="sum-row"><span class="sl">Rebate (11%)</span><span class="sv" id="r-rebate" style="color:#c0392b">$0.00</span></div>
+        <div class="sum-row highlight"><span class="sl">After Rebate</span><span class="sv" id="r-after">$0.00</span></div>
         <div class="sum-row" style="margin-top:8px"><span class="sl" style="font-size:12px;color:#aaa">Rebate applies to retail subtotal only</span></div>
       </div>
     </div>
@@ -348,11 +348,11 @@
   let preReduceSnapshot = null;
 
   function fmt(n) {
-    if (isNaN(n) || n === null) return 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';
+    if (isNaN(n) || n === null) return '$0.00';
     return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
   function fmtPct(n) {
-    if (isNaN(n) || n === null) return 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';
+    if (isNaN(n) || n === null) return '$0.00';
     return n.toFixed(1) + '%';
   }
 
@@ -416,7 +416,7 @@
         <td class="calc-cell" id="tcost-${row.id}">${fmt(c.totalCost)}</td>
         <td class="calc-cell" id="prof-${row.id}">${fmt(c.profit)}</td>
         <td class="calc-cell gmp-cell" id="gmp-${row.id}">${fmtPct(c.gmp)}</td>
-        <td><button class="del-btn" onclick="deleteRow(${row.id})">ÃÂÃÂÃÂÃÂ</button></td>
+        <td><button class="del-btn" onclick="deleteRow(${row.id})">×</button></td>
       `;
       tbody.appendChild(tr);
     });
@@ -532,7 +532,7 @@
     renderTable();
 
     if (totalSaved < target - 0.01) {
-      msg.textContent = `Could only reduce by ${fmt(totalSaved)} ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ GMP floor of ${gmpFloor}% reached on all eligible items.`;
+      msg.textContent = `Could only reduce by ${fmt(totalSaved)} $0.00 GMP floor of ${gmpFloor}% reached on all eligible items.`;
       msg.className = 'reducer-msg error';
     } else {
       msg.textContent = `ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Reduced subtotal by ${fmt(totalSaved)} across ${itemsAdjusted} item${itemsAdjusted !== 1 ? 's' : ''}. No item fell below ${gmpFloor}% GMP.`;
