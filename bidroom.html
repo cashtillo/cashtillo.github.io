@@ -240,6 +240,8 @@
   input[type=text], input[type=number] { border:none !important; background:transparent !important; padding:0 !important; font-size:11px; width:auto !important; }
   .summary-box, .rebate-box { page-break-inside:avoid; border:1px solid #ccc; padding:10px; border-radius:4px; }
   .summary-section { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .table-wrap { overflow:visible !important; }
+  table { min-width:0 !important; width:100% !important; }
   .rebate-box { border-color:#1a7a3c !important; }
 }
 </style>
@@ -623,7 +625,6 @@ function loadEstimate(name) {
   del.value = data.delivery || '0.00'; del.dispatchEvent(new Event('input'));
   document.getElementById('reduceTarget').value = data.reduceTarget || '';
   document.getElementById('gmpFloor').value = data.gmpFloor || '10';
-  document.getElementById('savedList').value = '';
 }
 function deleteSaved() {
   const sel = document.getElementById('savedList');
