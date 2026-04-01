@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menards Tool Boxes</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f1117;
+      min-height: 100vh;
+      color: #e8eaf0;
+    }
+    header {
+      background: linear-gradient(135deg, #1a1d2e 0%, #0f1117 100%);
+      border-bottom: 2px solid #f5a623;
+      padding: 32px 24px 28px;
+      text-align: center;
+    }
+    .logo-icon { font-size: 2.4rem; margin-bottom: 8px; display: block; }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+    header h1 span { color: #f5a623; }
+    header p {
+      margin-top: 6px;
+      font-size: 0.9rem;
+      color: #888ca0;
+      letter-spacing: 0.05em;
+    }
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 48px 24px;
+    }
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #f5a623;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #1a1d2e;
+      border: 1px solid #252840;
+      border-radius: 14px;
+      padding: 28px 24px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--accent, #f5a623);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .card:hover { border-color: var(--accent, #f5a623); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
+    .card:hover::before { opacity: 1; }
+    .card-icon {
+      width: 46px; height: 46px;
+      background: var(--accent-bg, #2a2000);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .card h2 { font-size: 1.05rem; font-weight: 700; color: #ffffff; }
+    .card p { font-size: 0.85rem; color: #888ca0; line-height: 1.5; }
+    .card-arrow {
+      margin-top: auto;
+      padding-top: 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent, #f5a623);
+      letter-spacing: 0.04em;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .card--bidroom { --accent: #00c896; --accent-bg: #00201a; }
+    .card--calculator { --accent: #4e9bff; --accent-bg: #001a2e; }
+    .card--clearance { --accent: #f5a623; --accent-bg: #2a1800; }
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 0.78rem;
+      color: #444760;
+      border-top: 1px solid #1a1d2e;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="logo-icon">🧰</span>
+    <h1>Menards <span>Tool Boxes</span></h1>
+    <p>Internal tools for quoting, estimating &amp; inventory</p>
+  </header>
+  <main>
+    <div class="section-label">Available Tools</div>
+    <div class="grid">
+      <a href="bidroom.html" class="card card--bidroom">
+        <div class="card-icon">📋</div>
+        <h2>Bidroom Estimating Tool</h2>
+        <p>Line-item estimating with GMP tracking, smart price reducer, and 11% rebate panel.</p>
+        <div class="card-arrow">Open Tool &rarr;</div>
+      </a>
+      <a href="calculator.html" class="card card--calculator">
+        <div class="card-icon">🧮</div>
+        <h2>Quote Calculator</h2>
+        <p>Enter subtotal and delivery to calculate tax, rebate, and total due.</p>
+        <div class="card-arrow">Open Tool &rarr;</div>
+      </a>
+      <a href="https://cashtillo.github.io/Clearancelist/" class="card card--clearance">
+        <div class="card-icon">🏷️</div>
+        <h2>Ray's List</h2>
+        <p>Clearance item tracker — scan PDFs, search by SKU, and print bin tags or labels.</p>
+        <div class="card-arrow">Open Tool &rarr;</div>
+      </a>
+    </div>
+  </main>
+  <footer>Menards Tool Boxes &mdash; cashtillo internal tools</footer>
+</body>
+</html>
