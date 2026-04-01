@@ -227,22 +227,26 @@
 .btn-print { background:#2c3e50 !important; color:#fff !important; border:none !important; }
 .btn-print:hover { background:#1a252f !important; }
 @media print {
-  body { background:#fff !important; }
-  a[style*="position:fixed"] { display:none !important; }
-  .no-print { display:none !important; }
+  body { background:#fff !important; color:#000 !important; }
+  .top-nav, a[style*="position:fixed"] { display:none !important; }
+  .no-print, .legend, .reducer-box, .btn-row { display:none !important; }
   .card { box-shadow:none !important; border:none !important; padding:0 !important; margin:0 !important; }
-  .job-name-print { display:block !important; }
-  .legend { display:none !important; }
-  #itemTable { width:100%; border-collapse:collapse; font-size:11px; }
-  #itemTable th, #itemTable td { border:1px solid #aaa; padding:5px 7px; }
-  #itemTable thead th { background:#eee !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .header { background:#009b3a !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; padding:16px 20px !important; margin-bottom:12px; }
+  .header h1, .header p { color:#fff !important; }
+  .job-name-print { display:block !important; font-size:15px; font-weight:700; color:#000; margin:6px 0 14px; }
+  .table-wrap { overflow:visible !important; margin-bottom:14px; }
+  table { min-width:0 !important; width:100% !important; border-collapse:collapse; font-size:10px; }
+  #itemTable th, #itemTable td { border:1px solid #aaa; padding:4px 6px; }
+  #itemTable thead th { background:#eeeeee !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  #itemTable th:last-child, #itemTable td:last-child { display:none !important; }
   button { display:none !important; }
-  input[type=text], input[type=number] { border:none !important; background:transparent !important; padding:0 !important; font-size:11px; width:auto !important; }
-  .summary-box, .rebate-box { page-break-inside:avoid; border:1px solid #ccc; padding:10px; border-radius:4px; }
-  .summary-section { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-  .table-wrap { overflow:visible !important; }
-  table { min-width:0 !important; width:100% !important; }
+  input[type=text], input[type=number] { border:none !important; background:transparent !important; padding:0 !important; font-size:10px; width:auto !important; box-shadow:none !important; }
+  .summary-grid { display:grid !important; grid-template-columns:1fr 1fr; gap:16px; }
+  .summary-box, .rebate-box { page-break-inside:avoid; border:1px solid #ccc !important; padding:12px !important; border-radius:4px; background:#fff !important; }
   .rebate-box { border-color:#1a7a3c !important; }
+  .sum-row { display:flex; justify-content:space-between; padding:3px 0; font-size:11px; }
+  .sum-row.highlight { font-weight:700; border-top:1px solid #ccc; margin-top:4px; padding-top:6px; }
+}
 }
 </style>
 </head>
