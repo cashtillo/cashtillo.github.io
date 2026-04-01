@@ -214,28 +214,65 @@
   .dot-green { background: #d4edda; border: 2px solid #1b7a1b; }
   .dot-orange { background: #fff3cd; border: 2px solid #c07000; }
   .dot-red { background: #ffe0e0; border: 2px solid #c0392b; }
+
+/* ── Job bar styles ── */
+.job-bar { display:flex; align-items:center; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+.job-name-input { flex:1; min-width:180px; padding:8px 12px; border:1.5px solid #ccc; border-radius:6px; font-size:0.95rem; font-family:inherit; }
+.btn-save { background:#1a7a3c; color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-size:0.85rem; white-space:nowrap; }
+.btn-save:hover { background:#155f30; }
+.saved-select { padding:8px 10px; border:1.5px solid #ccc; border-radius:6px; font-size:0.85rem; max-width:230px; }
+.btn-del-saved { background:#c0392b; color:#fff; border:none; padding:8px 10px; border-radius:6px; cursor:pointer; font-size:0.85rem; }
+.btn-del-saved:hover { background:#a93226; }
+.job-name-print { font-size:1.3rem; font-weight:700; margin-bottom:12px; color:#1a7a3c; display:none; }
+.btn-print { background:#2c3e50 !important; color:#fff !important; border:none !important; }
+.btn-print:hover { background:#1a252f !important; }
+@media print {
+  body { background:#fff !important; }
+  a[style*="position:fixed"] { display:none !important; }
+  .no-print { display:none !important; }
+  .card { box-shadow:none !important; border:none !important; padding:0 !important; margin:0 !important; }
+  .job-name-print { display:block !important; }
+  .legend { display:none !important; }
+  #itemTable { width:100%; border-collapse:collapse; font-size:11px; }
+  #itemTable th, #itemTable td { border:1px solid #aaa; padding:5px 7px; }
+  #itemTable thead th { background:#eee !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  button { display:none !important; }
+  input[type=text], input[type=number] { border:none !important; background:transparent !important; padding:0 !important; font-size:11px; width:auto !important; }
+  .summary-box, .rebate-box { page-break-inside:avoid; border:1px solid #ccc; padding:10px; border-radius:4px; }
+  .summary-section { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .rebate-box { border-color:#1a7a3c !important; }
+}
 </style>
 </head>
 <body>
 
 <div class="top-nav">
-  <a href="/">🧰 Menards Tool Boxes</a>
+  <a href="/">ð§° Menards Tool Boxes</a>
 </div>
 
 <div class="card">
   <div class="header">
     <div>
       <h1>Bidroom Estimating Tool</h1>
-      <p>Enter items Ã¢ÂÂ auto-calculates margin, profit &amp; rebate</p>
+      <p>Enter items ÃÂ¢ÃÂÃÂ auto-calculates margin, profit &amp; rebate</p>
     </div>
   </div>
 
   <div class="body">
 
     <!-- Legend -->
-    <div class="legend">
+    <div class="job-bar no-print">
+  <input type="text" id="jobName" class="job-name-input" placeholder="Job / Project Name..." />
+  <button class="btn-save" onclick="saveEstimate()">&#x1F4BE; Save</button>
+  <select id="savedList" class="saved-select" onchange="loadEstimate(this.value)">
+    <option value="">&#x1F4C2; Load Saved...</option>
+  </select>
+  <button class="btn-del-saved" onclick="deleteSaved()" title="Delete selected">&#x1F5D1;</button>
+</div>
+<div id="jobNameDisplay" class="job-name-print"></div>
+<div class="legend">
       <div class="legend-item"><div class="legend-dot dot-green"></div> GMP &gt; 20% (Healthy)</div>
-      <div class="legend-item"><div class="legend-dot dot-orange"></div> GMP 10Ã¢ÂÂ20% (Watch)</div>
+      <div class="legend-item"><div class="legend-dot dot-orange"></div> GMP 10ÃÂ¢ÃÂÃÂ20% (Watch)</div>
       <div class="legend-item"><div class="legend-dot dot-red"></div> GMP &lt; 10% (Low)</div>
     </div>
 
@@ -285,19 +322,19 @@
     <div class="summary-grid">
       <div class="summary-box">
         <h3>Quote Summary</h3>
-        <div class="sum-row"><span class="sl">Total Retail</span><span class="sv" id="s-totalRetail">Ã¢ÂÂ</span></div>
-        <div class="sum-row"><span class="sl">Total Cost</span><span class="sv" id="s-totalCost">Ã¢ÂÂ</span></div>
-        <div class="sum-row"><span class="sl">Total Profit</span><span class="sv" id="s-totalProfit">Ã¢ÂÂ</span></div>
-        <div class="sum-row"><span class="sl">Blended GMP</span><span class="sv" id="s-blendedGMP">Ã¢ÂÂ</span></div>
-        <div class="sum-row"><span class="sl">Tax (10%)</span><span class="sv" id="s-tax">Ã¢ÂÂ</span></div>
+        <div class="sum-row"><span class="sl">Total Retail</span><span class="sv" id="s-totalRetail">ÃÂ¢ÃÂÃÂ</span></div>
+        <div class="sum-row"><span class="sl">Total Cost</span><span class="sv" id="s-totalCost">ÃÂ¢ÃÂÃÂ</span></div>
+        <div class="sum-row"><span class="sl">Total Profit</span><span class="sv" id="s-totalProfit">ÃÂ¢ÃÂÃÂ</span></div>
+        <div class="sum-row"><span class="sl">Blended GMP</span><span class="sv" id="s-blendedGMP">ÃÂ¢ÃÂÃÂ</span></div>
+        <div class="sum-row"><span class="sl">Tax (10%)</span><span class="sv" id="s-tax">ÃÂ¢ÃÂÃÂ</span></div>
         <div class="sum-row"><span class="sl">Delivery</span><span class="sv"><input type="number" id="deliveryInput" placeholder="0.00" min="0" step="0.01" style="border:1px solid #ddd;border-radius:5px;padding:3px 7px;font-size:13px;width:90px" oninput="updateSummary()"></span></div>
-        <div class="sum-row highlight"><span class="sl">Due Today</span><span class="sv" id="s-due">Ã¢ÂÂ</span></div>
+        <div class="sum-row highlight"><span class="sl">Due Today</span><span class="sv" id="s-due">ÃÂ¢ÃÂÃÂ</span></div>
       </div>
       <div class="rebate-box">
         <h3>11% Menards Rebate</h3>
-        <div class="sum-row"><span class="sl">Subtotal (Retail)</span><span class="sv" id="r-subtotal">Ã¢ÂÂ</span></div>
-        <div class="sum-row"><span class="sl">Rebate (11%)</span><span class="sv" id="r-rebate" style="color:#c0392b">Ã¢ÂÂ</span></div>
-        <div class="sum-row highlight"><span class="sl">After Rebate</span><span class="sv" id="r-after">Ã¢ÂÂ</span></div>
+        <div class="sum-row"><span class="sl">Subtotal (Retail)</span><span class="sv" id="r-subtotal">ÃÂ¢ÃÂÃÂ</span></div>
+        <div class="sum-row"><span class="sl">Rebate (11%)</span><span class="sv" id="r-rebate" style="color:#c0392b">ÃÂ¢ÃÂÃÂ</span></div>
+        <div class="sum-row highlight"><span class="sl">After Rebate</span><span class="sv" id="r-after">ÃÂ¢ÃÂÃÂ</span></div>
         <div class="sum-row" style="margin-top:8px"><span class="sl" style="font-size:12px;color:#aaa">Rebate applies to retail subtotal only</span></div>
       </div>
     </div>
@@ -310,11 +347,11 @@
   let preReduceSnapshot = null;
 
   function fmt(n) {
-    if (isNaN(n) || n === null) return 'Ã¢ÂÂ';
+    if (isNaN(n) || n === null) return 'ÃÂ¢ÃÂÃÂ';
     return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
   function fmtPct(n) {
-    if (isNaN(n) || n === null) return 'Ã¢ÂÂ';
+    if (isNaN(n) || n === null) return 'ÃÂ¢ÃÂÃÂ';
     return n.toFixed(1) + '%';
   }
 
@@ -378,7 +415,7 @@
         <td class="calc-cell" id="tcost-${row.id}">${fmt(c.totalCost)}</td>
         <td class="calc-cell" id="prof-${row.id}">${fmt(c.profit)}</td>
         <td class="calc-cell gmp-cell" id="gmp-${row.id}">${fmtPct(c.gmp)}</td>
-        <td><button class="del-btn" onclick="deleteRow(${row.id})">ÃÂ</button></td>
+        <td><button class="del-btn" onclick="deleteRow(${row.id})">ÃÂÃÂ</button></td>
       `;
       tbody.appendChild(tr);
     });
@@ -494,10 +531,10 @@
     renderTable();
 
     if (totalSaved < target - 0.01) {
-      msg.textContent = `Could only reduce by ${fmt(totalSaved)} Ã¢ÂÂ GMP floor of ${gmpFloor}% reached on all eligible items.`;
+      msg.textContent = `Could only reduce by ${fmt(totalSaved)} ÃÂ¢ÃÂÃÂ GMP floor of ${gmpFloor}% reached on all eligible items.`;
       msg.className = 'reducer-msg error';
     } else {
-      msg.textContent = `Ã¢ÂÂ Reduced subtotal by ${fmt(totalSaved)} across ${itemsAdjusted} item${itemsAdjusted !== 1 ? 's' : ''}. No item fell below ${gmpFloor}% GMP.`;
+      msg.textContent = `ÃÂ¢ÃÂÃÂ Reduced subtotal by ${fmt(totalSaved)} across ${itemsAdjusted} item${itemsAdjusted !== 1 ? 's' : ''}. No item fell below ${gmpFloor}% GMP.`;
       msg.className = 'reducer-msg';
     }
     msg.style.display = 'block';
@@ -539,6 +576,87 @@
       if (e.target.closest('tr') === lastTr) addRow();
     }
   });
+
+// ─── Save / Load / Print ────────────────────────────
+function getRowData() {
+  const rows = [];
+  document.querySelectorAll('#tableBody tr').forEach(tr => {
+    const inp = tr.querySelectorAll('input');
+    if (inp.length >= 4) rows.push({ sku: inp[0].value, retail: inp[1].value, cost: inp[2].value, qty: inp[3].value });
+  });
+  return rows;
+}
+function saveEstimate() {
+  const name = document.getElementById('jobName').value.trim();
+  if (!name) { alert('Enter a job / project name first.'); return; }
+  const saves = JSON.parse(localStorage.getItem('bidroomSaves') || '{}');
+  saves[name] = {
+    name, rows: getRowData(),
+    delivery: document.getElementById('deliveryInput').value,
+    reduceTarget: document.getElementById('reduceTarget').value,
+    gmpFloor: document.getElementById('gmpFloor').value,
+    savedAt: new Date().toLocaleDateString()
+  };
+  localStorage.setItem('bidroomSaves', JSON.stringify(saves));
+  updateSavedList();
+  alert('"' + name + '" saved!');
+}
+function loadEstimate(name) {
+  if (!name) return;
+  const saves = JSON.parse(localStorage.getItem('bidroomSaves') || '{}');
+  const data = saves[name];
+  if (!data) return;
+  document.getElementById('jobName').value = data.name;
+  clearAll();
+  (data.rows || []).forEach(r => {
+    addRow();
+    const rows = document.querySelectorAll('#tableBody tr');
+    const last = rows[rows.length - 1];
+    const inp = last.querySelectorAll('input');
+    inp[0].value = r.sku;
+    inp[1].value = r.retail; inp[1].dispatchEvent(new Event('input'));
+    inp[2].value = r.cost;   inp[2].dispatchEvent(new Event('input'));
+    inp[3].value = r.qty;    inp[3].dispatchEvent(new Event('input'));
+  });
+  const del = document.getElementById('deliveryInput');
+  del.value = data.delivery || '0.00'; del.dispatchEvent(new Event('input'));
+  document.getElementById('reduceTarget').value = data.reduceTarget || '';
+  document.getElementById('gmpFloor').value = data.gmpFloor || '10';
+  document.getElementById('savedList').value = '';
+}
+function deleteSaved() {
+  const sel = document.getElementById('savedList');
+  const name = sel.value;
+  if (!name) { alert('Select a saved estimate to delete.'); return; }
+  if (!confirm('Delete "' + name + '"?')) return;
+  const saves = JSON.parse(localStorage.getItem('bidroomSaves') || '{}');
+  delete saves[name];
+  localStorage.setItem('bidroomSaves', JSON.stringify(saves));
+  updateSavedList();
+}
+function updateSavedList() {
+  const sel = document.getElementById('savedList');
+  if (!sel) return;
+  const saves = JSON.parse(localStorage.getItem('bidroomSaves') || '{}');
+  sel.innerHTML = '<option value="">&#x1F4C2; Load Saved...</option>';
+  Object.keys(saves).sort().forEach(name => {
+    const opt = document.createElement('option');
+    const d = saves[name];
+    opt.value = name;
+    opt.textContent = name + (d.savedAt ? '  — ' + d.savedAt : '');
+    sel.appendChild(opt);
+  });
+}
+function printEstimate() {
+  const name = (document.getElementById('jobName').value.trim()) || 'Estimate';
+  const disp = document.getElementById('jobNameDisplay');
+  disp.textContent = name;
+  disp.style.display = 'block';
+  window.print();
+  setTimeout(() => { disp.style.display = 'none'; }, 500);
+}
+updateSavedList();
+
 </script>
 </body>
 </html>
