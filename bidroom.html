@@ -679,7 +679,7 @@ function printEstimate() {
   setTimeout(() => { disp.style.display = 'none'; }, 500);
 }
 
-// ── PDF Import ───────────────────────────────────────────────────────────
+// -- PDF Import --
 let _pdfItems = [];
 
 async function handlePDFImport(input) {
@@ -725,14 +725,16 @@ function parseMenardsText(text) {
   const found = [];
   const seen = new Set();
   for (const line of text.split('\n')) {
-    const skuMatch = line.match(/\b(\d{7})\b/);
+    // Menards SKU format: NNN-NNNN (e.g. 102-0074, 123-1085)
+    const skuMatch = line.match(/\b(\d{3}-\d{4})\b/);
     if (!skuMatch) continue;
     const sku = skuMatch[1];
     if (seen.has(sku)) continue;
     seen.add(sku);
-    const after = line.substring(line.indexOf(sku) + 7);
-    const qtyMatch = after.match(/\b(\d{1,4})\b/);
-    found.push({ sku, qty: qtyMatch ? qtyMatch[1] : '1' });
+    // Qty is the number immediately before EACH or PKG on the line
+    const qtyMatch = line.match(/(\d+)\s+(?:EACH|PKG|EA)\b/i);
+    const qty = qtyMatch ? qtyMatch[1] : '1';
+    found.push({ sku, qty });
   }
   return found;
 }
