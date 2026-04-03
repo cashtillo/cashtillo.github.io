@@ -622,7 +622,63 @@ function saveEstimate() {
     savedAt: new Date().toLocaleDateString()
   };
   localStorage.setItem('bidroomSaves', JSON.stringify(saves));
-  
+  updateSavedList();
+  alert('"' + name + '" saved!');
+}
+function loadEstimate(name) {
+  if (!name) return;
+  const saves = JSON.parse(localStorage.getItem('bidroomSaves') || '{}');
+  const data = saves[name];
+  if (!data) return;
+  document.getElementById('jobName').value = data.name;
+  clearAll();
+  (data.rows || []).forEach(r => {
+    addRow();
+    const rows = document.querySelectorAll('#tableBody tr');
+    const last = rows[rows.length - 1];
+    const inp = last.querySelectorAll('input');
+    inp[0].value = r.sku;
+    inp[1].value = r.retail; inp[1].dispatchEvent(new Event('input'));
+    inp[2].value = r.cost;   inp[2].dispatchEvent(new Event('input'));
+    inp[3].value = r.qty;    inp[3].dispatchEvent(new Event('input'));
+  });
+  const del = document.getElementById('deliveryInput');
+  del.value = data.delivery || '0.00'; del.dispatchEvent(new Event('input'));
+  document.getElementById('reduceTarget').value = data.reduceTarget || '';
+  document.getElementById('gmpFloor').value = data.gmpFloor || '10';
+}
+function deleteSaved() {
+  const sel = document.getElementById('savedList');
+  const name = sel.value;
+  if (!name) { alert('Select a saved estimate to delete.'); return; }
+  if (!confirm('Delete "' + name + '"?')) return;
+  const saves = JSON.parse(localStorage.getItem('bidroomSaves') || '{}');
+  delete saves[name];
+  localStorage.setItem('bidroomSaves', JSON.stringify(saves));
+  updateSavedList();
+}
+function updateSavedList() {
+  const sel = document.getElementById('savedList');
+  if (!sel) return;
+  const saves = JSON.parse(localStorage.getItem('bidroomSaves') || '{}');
+  sel.innerHTML = '<option value="">&#x1F4C2; Load Saved...</option>';
+  Object.keys(saves).sort().forEach(name => {
+    const opt = document.createElement('option');
+    const d = saves[name];
+    opt.value = name;
+    opt.textContent = name + (d.savedAt ? '  â ' + d.savedAt : '');
+    sel.appendChild(opt);
+  });
+}
+function printEstimate() {
+  const name = (document.getElementById('jobName').value.trim()) || 'Estimate';
+  const disp = document.getElementById('jobNameDisplay');
+  disp.textContent = name;
+  disp.style.display = 'block';
+  window.print();
+  setTimeout(() => { disp.style.display = 'none'; }, 500);
+}
+
 // ── PDF Import ───────────────────────────────────────────────────────────
 let _pdfItems = [];
 
@@ -710,62 +766,7 @@ function closePDFModal() {
   document.getElementById('pdfModal').style.display = 'none';
   _pdfItems = [];
 }
-updateSavedList();
-  alert('"' + name + '" saved!');
-}
-function loadEstimate(name) {
-  if (!name) return;
-  const saves = JSON.parse(localStorage.getItem('bidroomSaves') || '{}');
-  const data = saves[name];
-  if (!data) return;
-  document.getElementById('jobName').value = data.name;
-  clearAll();
-  (data.rows || []).forEach(r => {
-    addRow();
-    const rows = document.querySelectorAll('#tableBody tr');
-    const last = rows[rows.length - 1];
-    const inp = last.querySelectorAll('input');
-    inp[0].value = r.sku;
-    inp[1].value = r.retail; inp[1].dispatchEvent(new Event('input'));
-    inp[2].value = r.cost;   inp[2].dispatchEvent(new Event('input'));
-    inp[3].value = r.qty;    inp[3].dispatchEvent(new Event('input'));
-  });
-  const del = document.getElementById('deliveryInput');
-  del.value = data.delivery || '0.00'; del.dispatchEvent(new Event('input'));
-  document.getElementById('reduceTarget').value = data.reduceTarget || '';
-  document.getElementById('gmpFloor').value = data.gmpFloor || '10';
-}
-function deleteSaved() {
-  const sel = document.getElementById('savedList');
-  const name = sel.value;
-  if (!name) { alert('Select a saved estimate to delete.'); return; }
-  if (!confirm('Delete "' + name + '"?')) return;
-  const saves = JSON.parse(localStorage.getItem('bidroomSaves') || '{}');
-  delete saves[name];
-  localStorage.setItem('bidroomSaves', JSON.stringify(saves));
-  updateSavedList();
-}
-function updateSavedList() {
-  const sel = document.getElementById('savedList');
-  if (!sel) return;
-  const saves = JSON.parse(localStorage.getItem('bidroomSaves') || '{}');
-  sel.innerHTML = '<option value="">&#x1F4C2; Load Saved...</option>';
-  Object.keys(saves).sort().forEach(name => {
-    const opt = document.createElement('option');
-    const d = saves[name];
-    opt.value = name;
-    opt.textContent = name + (d.savedAt ? '  â ' + d.savedAt : '');
-    sel.appendChild(opt);
-  });
-}
-function printEstimate() {
-  const name = (document.getElementById('jobName').value.trim()) || 'Estimate';
-  const disp = document.getElementById('jobNameDisplay');
-  disp.textContent = name;
-  disp.style.display = 'block';
-  window.print();
-  setTimeout(() => { disp.style.display = 'none'; }, 500);
-}
+
 updateSavedList();
 
 </script>
