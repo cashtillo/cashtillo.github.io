@@ -692,12 +692,23 @@ async function handlePDFImport(input) {
   try {
     const buf = await file.arrayBuffer();
     _pdfItems = await parseMenardsRaw(buf);
-    if (_pdfItems.length === 0 && window['pdfjs-dist/build/pdf']) {
-      _pdfItems = await parseMenardsViaPDFJS(buf);
+    if (_pdfItems.length < 2 && window['pdfjs-dist/build/pdf']) {
+      const pdfjsItems = await parseMenardsViaPDFJS(buf);
+      const skus = new Set(_pdfItems.map(x => x.sku));
+      for (const it of pdfjsItems) if (!skus.has(it.sku)) _pdfItems.push(it);
     }
+    let fmt = '';
+    try {
+      const bytes = new Uint8Array(buf);
+      let snippet = '';
+      for (let i = 0; i < Math.min(bytes.length, 30000); i++) snippet += String.fromCharCode(bytes[i]);
+      if (/INVOICE\s*(?:#|NO|NUMBER)|BILL\s*TO/i.test(snippet)) fmt = 'Invoice';
+      else if (/ESTIMATE|QUOTE\s*#/i.test(snippet)) fmt = 'Estimate';
+    } catch(e) {}
+    const label = fmt || 'Menards PDF';
     const preview = _pdfItems.length > 0
-      ? 'Found ' + _pdfItems.length + ' item(s):\n' + _pdfItems.map(x => x.sku + '  x' + x.qty).join('\n')
-      : 'No SKUs found.\nMake sure this is a Menards estimate PDF.';
+      ? label + ' — found ' + _pdfItems.length + ' item(s):\n' + _pdfItems.map(x => x.sku + '  x' + x.qty).join('\n')
+      : 'No SKUs found.\nMake sure this is a Menards estimate or invoice PDF.';
     document.getElementById('pdfRawPreview').textContent = preview;
     renderPDFItems();
     document.getElementById('pdfModal').style.display = 'flex';
@@ -716,6 +727,7 @@ async function parseMenardsRaw(arrayBuffer) {
   for (let i = 0; i < bytes.length; i++) raw += String.fromCharCode(bytes[i]);
   const found = [];
   const seen = new Set();
+  let accText = '';
   let pendingSku = null;
   let pos = 0;
   while (pos < raw.length) {
@@ -754,6 +766,7 @@ async function parseMenardsRaw(arrayBuffer) {
       while ((cm = cr.exec(tm[1])) !== null) {
         chars += cm[1].replace(/\\([()\\])/g, '$1');
       }
+      if (chars) accText += chars + '\n';
       const skuM = chars.match(/^(\d{3}-\d{4})/);
       const qtyM = chars.match(/(\d{1,4})(?=EACH|PKG|EA\b)/i);
       if (skuM && !seen.has(skuM[1])) {
@@ -763,6 +776,16 @@ async function parseMenardsRaw(arrayBuffer) {
         seen.add(pendingSku); found.push({sku:pendingSku,qty:qtyM[1]}); pendingSku=null;
       }
     }
+    const tjSingleRe = /\(([^)]*)\)\s*Tj/g;
+    let sm;
+    while ((sm = tjSingleRe.exec(decomp)) !== null) {
+      const chars = sm[1].replace(/\\([()\\])/g, '$1');
+      if (chars) accText += chars + '\n';
+    }
+  }
+  const textItems = parseMenardsText(accText);
+  for (const it of textItems) {
+    if (!seen.has(it.sku)) { seen.add(it.sku); found.push(it); }
   }
   return found;
 }
@@ -791,14 +814,35 @@ async function parseMenardsViaPDFJS(arrayBuffer) {
 function parseMenardsText(text) {
   const found = [];
   const seen = new Set();
-  for (const line of text.split('\n')) {
-    const skuMatch = line.match(/\b(\d{3}-\d{4})\b/);
-    if (!skuMatch) continue;
-    const sku = skuMatch[1];
-    if (seen.has(sku)) continue;
-    seen.add(sku);
-    const qtyMatch = line.match(/(\d{1,4})\s+(?:EACH|PKG|EA)\b/i);
-    found.push({ sku, qty: qtyMatch ? qtyMatch[1] : '1' });
+  const lines = text.split(/\r?\n/);
+  for (let li = 0; li < lines.length; li++) {
+    const line = lines[li];
+    const skuRe = /\b(\d{3}-\d{4})\b/g;
+    const skuMatches = [];
+    let sm;
+    while ((sm = skuRe.exec(line)) !== null) skuMatches.push({ sku: sm[1], at: sm.index });
+    for (let si = 0; si < skuMatches.length; si++) {
+      const sku = skuMatches[si].sku;
+      if (seen.has(sku)) continue;
+      const afterStart = skuMatches[si].at + 8;
+      const afterEnd = si + 1 < skuMatches.length ? skuMatches[si+1].at : line.length;
+      const after = line.slice(afterStart, afterEnd);
+      const before = si === 0 ? line.slice(0, skuMatches[si].at) : '';
+      const span = before + ' ' + after;
+      let qty = null;
+      const p1 = span.match(/(\d{1,4})\s*(?:EACH|PKG|EA|PC|PCS)\b/i);
+      if (p1) qty = p1[1];
+      if (!qty) {
+        const p2 = span.match(/\b(?:SHIP(?:PED)?|SHP|ORD(?:ERED)?|QTY)\s*[:\s]?\s*(\d{1,4})\b/i);
+        if (p2) qty = p2[1];
+      }
+      if (!qty && li + 1 < lines.length && si === skuMatches.length - 1) {
+        const p3 = lines[li + 1].match(/^\s*(\d{1,4})\s*(?:EACH|PKG|EA|PC|PCS)?\b/i);
+        if (p3) qty = p3[1];
+      }
+      seen.add(sku);
+      found.push({ sku, qty: qty || '1' });
+    }
   }
   return found;
 }
