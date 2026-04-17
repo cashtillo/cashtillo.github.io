@@ -381,7 +381,7 @@
 
   function addRow(sku='', retail='', cost='', qty='') {
     const id = Date.now() + Math.random();
-    rows.push({ id, sku, retail, cost, qty });
+    rows.push({ id, sku, retail, cost, qty, origRetail: retail });
     renderTable();
     // Focus the new SKU cell
     setTimeout(() => {
@@ -397,7 +397,11 @@
 
   function updateRow(id, field, value) {
     const row = rows.find(r => r.id === id);
-    if (row) row[field] = value;
+    if (row) {
+      row[field] = value;
+      // User-entered retail resets origRetail (so discount = 0 until reducer runs)
+      if (field === 'retail') row.origRetail = value;
+    }
     updateSummary();
     updateRowColors();
   }
@@ -406,7 +410,11 @@
     const retail = parseFloat(row.retail) || 0;
     const cost = parseFloat(row.cost) || 0;
     const qty = parseFloat(row.qty) || 0;
-    const discount = retail - cost;
+    // Discount = how much retail was reduced from its original value (x qty)
+    const origRaw = row.origRetail;
+    const origRetail = (origRaw !== undefined && origRaw !== null && origRaw !== '')
+      ? (parseFloat(origRaw) || 0) : retail;
+    const discount = Math.max(0, origRetail - retail) * qty;
     const totalRetail = retail * qty;
     const totalCost = cost * qty;
     const profit = (retail - cost) * qty;
@@ -603,12 +611,18 @@
 
 // âââ Save / Load / Print ââââââââââââââââââââââââââââ
 function getRowData() {
-  const rows = [];
+  const out = [];
   document.querySelectorAll('#tableBody tr').forEach(tr => {
     const inp = tr.querySelectorAll('input');
-    if (inp.length >= 4) rows.push({ sku: inp[0].value, retail: inp[1].value, cost: inp[2].value, qty: inp[3].value });
+    if (inp.length >= 4) {
+      const rid = parseFloat(tr.dataset.id);
+      const rowG = (typeof rows !== 'undefined') ? rows.find(r => r.id === rid) : null;
+      const origRetail = (rowG && rowG.origRetail !== undefined && rowG.origRetail !== null)
+        ? rowG.origRetail : inp[1].value;
+      out.push({ sku: inp[0].value, retail: inp[1].value, cost: inp[2].value, qty: inp[3].value, origRetail: origRetail });
+    }
   });
-  return rows;
+  return out;
 }
 function saveEstimate() {
   const name = document.getElementById('jobName').value.trim();
@@ -633,15 +647,19 @@ function loadEstimate(name) {
   document.getElementById('jobName').value = data.name;
   clearAll();
   (data.rows || []).forEach(r => {
-    addRow();
-    const rows = document.querySelectorAll('#tableBody tr');
-    const last = rows[rows.length - 1];
-    const inp = last.querySelectorAll('input');
-    inp[0].value = r.sku;
-    inp[1].value = r.retail; inp[1].dispatchEvent(new Event('input'));
-    inp[2].value = r.cost;   inp[2].dispatchEvent(new Event('input'));
-    inp[3].value = r.qty;    inp[3].dispatchEvent(new Event('input'));
+    const id = Date.now() + Math.random();
+    const origRetail = (r.origRetail !== undefined && r.origRetail !== null) ? r.origRetail : (r.retail || '');
+    rows.push({
+      id: id,
+      sku: r.sku || '',
+      retail: r.retail || '',
+      cost: r.cost || '',
+      qty: r.qty || '',
+      origRetail: origRetail
+    });
   });
+  renderTable();
+  updateSummary();
   const del = document.getElementById('deliveryInput');
   del.value = data.delivery || '0.00'; del.dispatchEvent(new Event('input'));
   document.getElementById('reduceTarget').value = data.reduceTarget || '';
@@ -867,7 +885,7 @@ function loadPDFItems() {
   preReduceSnapshot = null;
   document.getElementById('undoBtn').style.display = 'none';
   document.getElementById('reducerMsg').style.display = 'none';
-  valid.forEach(it => rows.push({ id: Date.now() + Math.random(), sku: it.sku.trim(), retail: '', cost: '', qty: it.qty || '1' }));
+  valid.forEach(it => rows.push({ id: Date.now() + Math.random(), sku: it.sku.trim(), retail: '', cost: '', qty: it.qty || '1', origRetail: '' }));
   renderTable();
   closePDFModal();
 }
